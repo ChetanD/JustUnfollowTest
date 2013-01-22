@@ -10,8 +10,12 @@ var map;
 var markerSize = []; 
 var infowindow = [];
 
+
+//initialize my script
 function init() {
 
+
+         //create google map on page
           var stockholm = new google.maps.LatLng(25.32522, 5.07002);
 		  var mapOptions = {
 		    zoom: 2,
@@ -42,11 +46,19 @@ function init() {
           
           $("#start").bind("click",startlocating);
           
+          
+          
           loaddata();
 		  	
 }
 
 
+/*
+           * load data before starting any operation
+           * storing co-ordinate according to country
+           * 
+     */
+          
 function loaddata() {
 
      	country["US"] = new Array();
@@ -98,7 +110,9 @@ function loaddata() {
 }
 
 
-
+/**
+ *  to give feel of real time this function fetch each follower from given country after each 100 ms
+ */
 function startlocating() {
 	
 	
@@ -113,7 +127,7 @@ function startlocating() {
 		
 		if( NoFollower[selectCountry] > 0 ) {
 			
-			markThisPlace(country[selectCountry],selectCountry);
+			markThisPlace(selectCountry);
 			no--;
 			NoFollower[selectCountry]-- ;
 		    
@@ -131,60 +145,76 @@ function startlocating() {
 }
 
 
+
+/**
+ * 
+ * @param {Object} selectcountry
+ * 
+ * load google map resources
+ * create array of info window for all country (i.e. 8 country given in this example)
+ * create array of mark up and size of marker icon image for all given country
+ * bind infowindow to corresponding marker
+ * 
+ */
 function loadMarker( selectcountry) {
 	
-	
-  
 	
 	if( markerSize[selectcountry] == undefined) {
 		
 		infowindow[selectcountry] = new google.maps.InfoWindow({
-				 
-				  	 
-		        			
+		
+				 			
         }); 
 		markerSize[selectcountry]  = new Object();
 		markerSize[selectcountry].width = 10 ;
 		markerSize[selectcountry].height = 10 ;
+		var place = country[selectcountry];
+		var parliament = new google.maps.LatLng( place[0],place[1] );
+ 	    var marker = new google.maps.Marker({
+	   		 map:map,
+	    	position: parliament,
+	    
+	    });
+	    markerSize[selectcountry].marker = marker;
+	    console.log(markerSize[selectcountry].marker)
+		google.maps.event.addListener(marker, "mouseover", function() {
+					infowindow[selectcountry].open(map, marker);
+	    });		  
+		
 		
 	}
 	
-	  
-				  
-				  
-	
 }
-function markThisPlace( place,selectCountry ) {
+
+
+/**
+ * 
+ * @param {Object} selectCountry
+ * this is use to change marker icon images depending on follower and real time infowindow's contet change
+ * 
+ */
+function markThisPlace( selectCountry ) {
 
 
                   var height = markerSize[selectCountry].height;
 				  var width = markerSize[selectCountry].width;
-				  
+				  var marker = markerSize[selectCountry].marker;
 	
+	              console.log(marker);
 	              markerSize[selectCountry].height += 2;
 				  markerSize[selectCountry].width += 2;
 				  var obj = infowindow[selectCountry];
-				  obj.setContent("Followers:"+((height-10)/2+1)); 
+				  obj.setContent("Followers:"+((height-10)/2+1));
+				  
+				   
                   if ( selectCountry.indexOf(" ") != -1 ) {
 				  	
 				  	selectCountry = selectCountry.replace(" ","");
 				 
 				  	
 				  }
-				  
-        		  
-				  var parliament = new google.maps.LatLng( place[0],place[1] );
-			 	   var marker = new google.maps.Marker({
-				    map:map,
-				    position: parliament,
-				    icon:new google.maps.MarkerImage("./images/"+selectCountry+".png", null, null, null, new google.maps.Size(width + 2, height+2))
-				  });
 
-				  
-				google.maps.event.addListener(marker, "mouseover", function() {
-					obj.open(map, marker);
-			    });
-				
+				  marker.setIcon(new google.maps.MarkerImage("./images/"+selectCountry+".png", null, null, null, new google.maps.Size(width + 2, height+2)));
  	
 }
 
