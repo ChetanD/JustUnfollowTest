@@ -177,9 +177,12 @@ function loadMarker( selectcountry) {
 	    });
 	    markerSize[selectcountry].marker = marker;
 	    console.log(markerSize[selectcountry].marker)
-		google.maps.event.addListener(marker, "mouseover", function() {
+	    google.maps.event.addListener(marker, "mouseover", function() {
 					infowindow[selectcountry].open(map, marker);
-	    });		  
+	    });
+	    google.maps.event.addListener(marker, "mouseout", function() {
+					infowindow[selectcountry].close();
+	    })	  
 		
 		
 	}
